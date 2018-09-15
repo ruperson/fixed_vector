@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -std=c++17 -pedantic  -g -D_GLIBCXX_DEBUG -DDEBUG   CMakeFiles/fixed_vector_test.dir/vector_tests.cpp.o  -o fixed_vector_test 

@@ -1,3 +1,0 @@
-/mnt/c/Users/tigra/Desktop/fixed_vector/fixed_vector/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/tigra/Desktop/fixed_vector/fixed_vector/CMakeFiles/fixed_vector_test.dir
-/mnt/c/Users/tigra/Desktop/fixed_vector/fixed_vector/CMakeFiles/edit_cache.dir
