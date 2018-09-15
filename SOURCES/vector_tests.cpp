@@ -2,13 +2,9 @@
 
 #include <doctest/doctest.h>
 #include "fixed_vector.h"
-//#include "base_vector.h"
 
 template<class T, size_t size>
 using test_vector = fixed_vector<T, size>;
-
- //template<class T, size_t size>
- //using test_vector = base::vector<T, size>;
 
 TEST_CASE("Empty vector") {
     SUBCASE("int") {
