@@ -136,24 +136,24 @@ TEST_CASE("iterators") {
     }
 }
 
-// TEST_CASE("random tests") {
-//     constexpr uint32_t cnt_tests = 100'000;
-//     constexpr uint32_t cnt_values = 1000;
-//     constexpr uint32_t cnt_erase = cnt_values / 10;
-//
-//     std::vector<int> values;
-//     test_vector<int, cnt_values> vector;
-//
-//     for (size_t j = 0; j < cnt_values; ++j) {
-//         values.push_back(random() % cnt_values);
-//         vector.push_back(random() % cnt_values);
-//     }
-//
-//     SUBCASE("insert/erase") {
-//         for (size_t i = 0; i < cnt_erase; ++i) {
-//             vector.erase(vector.begin() + (std::random() % vector.size()));
-//             values.erase(vector.begin() + (std::random() % vector.size()));
-//        }
-//    }
-//}
+TEST_CASE("random tests") {
+    constexpr uint32_t cnt_tests = 100'000;
+    constexpr uint32_t cnt_values = 1000;
+    constexpr uint32_t cnt_erase = cnt_values / 10;
+
+    std::vector<int> values;
+    test_vector<int, cnt_values> vector;
+
+    for (size_t j = 0; j < cnt_values; ++j) {
+        values.push_back(random() % cnt_values);
+        vector.push_back(random() % cnt_values);
+    }
+
+    SUBCASE("insert/erase") {
+        for (size_t i = 0; i < cnt_erase; ++i) {
+            vector.erase(vector.begin() + (random() % vector.size()));
+            values.erase(values.begin() + (random() % values.size()));
+       }
+   }
+}
 
