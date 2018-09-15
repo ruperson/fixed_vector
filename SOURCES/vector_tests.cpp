@@ -30,6 +30,14 @@ TEST_CASE("Empty vector") {
     }
 }
 
+TEST_CASE("Copy/assignment") {
+    test_vector<int, 10> v;
+
+    SUBCASE("Copy constructor(same size)") {
+        test_vector<int, 10> v2(v);
+    }
+}
+
 TEST_CASE("One value") {
     SUBCASE("int") {
         test_vector<int, 100> v;
@@ -96,7 +104,12 @@ TEST_CASE("erasing") {
         v.erase(v.begin());
         CHECK(v.front() == strings.back());
     }
-    
+
+    SUBCASE("const/erase") {
+        v.erase(static_cast<const test_vector<std::string, 2> &>(v).begin());
+        CHECK(v.front() == strings.back());
+    }
+
      SUBCASE("clear") {
          v.clear();
          CHECK(v.size() == 0);
@@ -136,24 +149,56 @@ TEST_CASE("iterators") {
     }
 }
 
-TEST_CASE("random tests") {
-    constexpr uint32_t cnt_tests = 100'000;
-    constexpr uint32_t cnt_values = 1000;
-    constexpr uint32_t cnt_erase = cnt_values / 10;
+ TEST_CASE("random tests") {
+     constexpr uint32_t cnt_values = 1000;
+     constexpr uint32_t cnt_erase = cnt_values / 10;
 
-    std::vector<int> values;
-    test_vector<int, cnt_values> vector;
+     std::vector<int> values;
+     test_vector<int, cnt_values> vector;
 
-    for (size_t j = 0; j < cnt_values; ++j) {
-        values.push_back(random() % cnt_values);
-        vector.push_back(random() % cnt_values);
+     for (size_t j = 0; j < cnt_values; ++j) {
+         int value = static_cast<int>(random() % cnt_values);
+         values.push_back(value);
+         vector.push_back(value);
+     }
+
+     SUBCASE("insert/erase") {
+         for (size_t i = 0; i < cnt_erase; ++i) {
+             decltype(values)::size_type id = random() % vector.size();
+             vector.erase(vector.begin() + id);
+             values.erase(values.begin() + id);
+        }
+
+        for (size_t i = 0; i < cnt_erase; ++i) {
+            decltype(values)::size_type id = random() % vector.size();
+            vector.erase(vector.begin() + id);
+            values.erase(values.begin() + id);
+        }
+
+        CHECK(std::equal(vector.begin(), vector.end(), values.begin()));
     }
 
-    SUBCASE("insert/erase") {
-        for (size_t i = 0; i < cnt_erase; ++i) {
-            vector.erase(vector.begin() + (random() % vector.size()));
-            values.erase(values.begin() + (random() % values.size()));
-       }
-   }
-}
+    SUBCASE("erase/back") {
+         for (size_t i = 0; i < vector.size(); ++i) {
+             vector.erase((vector.begin() + vector.size()) - 1);
+             values.erase((values.begin() + values.size()) - 1);
+             CHECK(vector.back() == values.back());
+         }
+    }
 
+    SUBCASE("pop_back/end() - 1") {
+        for (size_t i = 0; i < vector.size(); ++i) {
+            vector.pop_back();
+            values.pop_back();
+            CHECK(*std::prev(vector.end()) == *std::prev(values.end()));
+        }
+    }
+
+    SUBCASE("erase(begin()/front()") {
+        for (size_t i = 0; i < vector.size(); ++i) {
+            vector.erase(vector.begin());
+            values.erase(values.begin());
+            CHECK(vector.front() == values.front());
+        }
+    }
+}

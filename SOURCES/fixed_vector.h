@@ -28,10 +28,10 @@ public:
 	std::size_t size() const {
 		return _size;
 	 }
-	std::size_t capacity() const {
+	constexpr std::size_t capacity() const {
 		return N;
 	}
-	std::size_t max_size() const {
+	constexpr std::size_t max_size() const {
 		return N;
 	}
 	
@@ -79,94 +79,11 @@ private:
 	typename std::aligned_storage<sizeof(T), alignof(T)>::type data[N];
 	std::size_t _size;
 
-private:
-	template <typename U>
-	struct basic_iterator;
-
 public:
-	using iterator = basic_iterator<T>;
-	using const_iterator = basic_iterator<const T>;
+	using iterator = T*;
+	using const_iterator = const T*;
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
-private:
-	template <typename U>
-	struct basic_iterator {
-		friend class fixed_vector<T, N>;
-
-		basic_iterator() = default;
-		basic_iterator(basic_iterator<T> const& other) : ptr(other.ptr) {}
-		basic_iterator& operator++() {
-			++ptr;
-			return *this;
-		}
-		basic_iterator operator++(int) {
-			basic_iterator<U> old(*this);
-			++*this;
-			return old;
-		}
-		basic_iterator& operator--() {
-			--ptr;
-			return *this;
-		}
-		basic_iterator operator--(int) {
-			basic_iterator<U> old(*this);
-			--*this;
-			return old;
-		}
-
-		basic_iterator& operator+=(std::ptrdiff_t n) {
-			ptr += n;
-			return *this;
-		}
-
-		basic_iterator& operator-=(std::ptrdiff_t n) {
-			ptr -= n;
-			return *this;
-		}
-
-
-		U& operator*() const {
-			return *ptr;
-		}
-
-		U* operator->() const { 
-			return ptr;
-		}
-
-		friend bool operator==(basic_iterator const &a, basic_iterator const &b) {
-			return a.ptr == b.ptr;
-		}
-
-		friend bool operator!=(basic_iterator const &a, basic_iterator const &b) {
-			return a.ptr != b.ptr;
-		}
-
-		friend bool operator<(basic_iterator const &a, basic_iterator const &b) { return a.ptr < b.ptr; }
-		friend bool operator>(basic_iterator const &a, basic_iterator const &b) { return a.ptr > b.ptr; }
-		friend bool operator<=(basic_iterator const &a, basic_iterator const &b) { return a.ptr <= b.ptr; }
-		friend bool operator>=(basic_iterator const &a, basic_iterator const &b) { return a.ptr >= b.ptr; }
-
-
-		friend std::ptrdiff_t operator-(basic_iterator const &a, basic_iterator const &b) { return a.ptr - b.ptr; }
-
-		friend basic_iterator operator+(std::ptrdiff_t n, basic_iterator a) { a.ptr += n; return a; }
-		friend basic_iterator operator+(basic_iterator a, std::ptrdiff_t n) { a.ptr += n; return a; }
-		friend basic_iterator operator-(std::ptrdiff_t n, basic_iterator a) { a.ptr -= n; return a; }
-		friend basic_iterator operator-(basic_iterator a, std::ptrdiff_t n) { a.ptr -= n; return a; }
-
-
-		using iterator_category = std::bidirectional_iterator_tag;
-		using difference_type = std::ptrdiff_t;
-		using value_type = U;
-		using pointer = U * ;
-		using reference = U & ;
-
-	private:
-		basic_iterator(T* p) : ptr(p) {}
-		T* ptr;
-	};
-
 
 public:
 	iterator begin() { 
@@ -213,23 +130,23 @@ public:
 
 	
 	iterator insert(const_iterator pos, T const& value) {
-		std::size_t i = std::distance(cbegin(), pos);
+		auto i = static_cast<std::size_t>(std::distance(cbegin(), pos));
 		push_back(back());
 		for (auto j = _size - 1; j != i; --j) {
-			operator[](j) = operator[](j - 1); //move ?
+			operator[](j) = operator[](j - 1); 
 		}
 
 		operator[](i) = value;
-		return iterator(pos.ptr);
+		return iterator(pos);
 	}
 	
 	iterator erase(const_iterator pos) {
-		std::size_t i = std::distance(cbegin(), pos);
+		auto i = static_cast<std::size_t>(std::distance(cbegin(), pos));
 		for (; i + 1 < _size; ++i) {
-			operator[](i) = operator[](i + 1); //move ?
+			operator[](i) = operator[](i + 1); 
 		}
 		pop_back();
-		return iterator(pos.ptr);
+		return iterator(pos);
 	}
 
 	iterator erase(const_iterator begin, const_iterator end) {
@@ -237,6 +154,6 @@ public:
 			i = erase(i);
 			--end;
 		}
-		return iterator(end.ptr);
+		return iterator(end);
 	}
 };
